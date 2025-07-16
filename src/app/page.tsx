@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
+
 const Home = () => {
-  return <></>;
+  redirect("/search");
 };
 
 export default Home;
