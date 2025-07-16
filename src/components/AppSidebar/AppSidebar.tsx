@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Bot, Settings2, SquareTerminal } from "lucide-react";
+import { BookOpen, Settings2, SquareTerminal } from "lucide-react";
 import AppSidebarMain from "@/components/AppSidebarMain";
 import AppSidebarHeader from "@/components/AppSidebarHeader";
 import {
@@ -20,35 +20,12 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Search",
+          url: "/search",
         },
         {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
+          title: "Library",
+          url: "/library",
         },
       ],
     },
