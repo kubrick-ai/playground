@@ -26,8 +26,7 @@ export const EmbeddingSchema = z.object({
   start_time: z.number(),
   end_time: z.number(),
   scope: EmbeddingScopeSchema,
-  type: EmbeddingModalitySchema,
-  // modality: EmbeddingModalitySchema,
+  modality: EmbeddingModalitySchema,
 });
 
 export type Embedding = z.infer<typeof EmbeddingSchema>;
