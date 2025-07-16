@@ -37,7 +37,6 @@ const search = async (params: SearchParams): Promise<Array<Embedding>> => {
   }
 
   const response = await axios.post(`${API_BASE}/search`, formData);
-  console.log(response);
   const parsedVideos = EmbeddingSchema.array().parse(response.data.data);
   return parsedVideos;
 };
@@ -46,6 +45,7 @@ export const useSearchVideos = (params: SearchParams) => {
   return useQuery<Array<Embedding>, Error>({
     queryKey: ["searchVideos", params], // Unique key for this query
     queryFn: () => search(params), // Your async function to fetch data
+    enabled: !!params.query_text || !!params.query_media_type, // Only run when there's something to search
   });
 };
 

@@ -2,38 +2,62 @@
 
 import { useState } from "react";
 import { useSearchVideos } from "@/hooks/useKubrickAPI";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+
+const searchFormSchema = z.object({
+  query_text: z.string().min(1, "Search query is required"),
+});
 
 const Search = () => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [searchParams, setSearchParams] = useState<{ query_text?: string }>({});
   const { data: embeddings, isLoading, error } = useSearchVideos(searchParams);
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      setSearchParams({ query_text: searchQuery });
-    }
+  const form = useForm<z.infer<typeof searchFormSchema>>({
+    resolver: zodResolver(searchFormSchema),
+    defaultValues: {
+      query_text: "",
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof searchFormSchema>) => {
+    setSearchParams({ query_text: values.query_text });
   };
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Playground - Search</h1>
 
-      <div className="mb-6">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Enter search query..."
-          className="border border-gray-300 rounded px-3 py-2 w-full max-w-md mr-2"
-          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-        />
-        <button
-          onClick={handleSearch}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex w-full max-w-sm items-center gap-1"
         >
-          Search
-        </button>
-      </div>
+          <FormField
+            control={form.control}
+            name="query_text"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormControl>
+                  <Input placeholder="Enter search query..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit">Search</Button>
+        </form>
+      </Form>
 
       {isLoading && <p>Loading...</p>}
       {error && <p className="text-red-500">Error: {error.message}</p>}
