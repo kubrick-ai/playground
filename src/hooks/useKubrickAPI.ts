@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { VideoSchema, Video, EmbeddingSchema, Embedding } from "@/types";
+import { useEffect, useState } from "react";
 
 // TODO: Move to config?
 const API_BASE = "/api/proxy";
@@ -74,3 +75,76 @@ export const useSearchVideos = (params: SearchParams) => {
 //     },
 //   });
 // };
+interface EmbedResponse {
+  id: string;
+  video_url: string;
+}
+
+interface TaskStatus {
+  id: string;
+  status: "processing" | "ready" | "failed";
+  error?: string;
+}
+
+const createEmbedTask = async (video_url: string): Promise<EmbedResponse> => {
+  const formData = new FormData();
+  formData.append("video_url", video_url);
+
+  const res = await axios.post(`${API_BASE}/tasks`, formData);
+  return res.data;
+};
+
+const getEmbedStatus = async (taskId: string): Promise<TaskStatus> => {
+  const res = await axios.get(`${API_BASE}/tasks/${taskId}`);
+  return res.data;
+};
+
+export const useEmbedVideo = () => {
+  const [taskId, setTaskId] = useState<string | null>(null);
+
+  const {
+    mutate: submitVideo,
+    isPending: isSubmitting,
+    data: embedData,
+    isSuccess: isSubmitSuccess,
+    error: submitError,
+  } = useMutation({
+    mutationFn: (video_url: string) => createEmbedTask(video_url),
+    onSuccess: (data) => setTaskId(data.id),
+  });
+
+  const {
+    data: statusData,
+    refetch,
+    isFetching: isPolling,
+  } = useQuery({
+    enabled: !!taskId,
+    queryKey: ["embedStatus", taskId],
+    queryFn: () => getEmbedStatus(taskId as string),
+  });
+
+  useEffect(() => {
+    if (!taskId) return;
+
+    const interval = setInterval(() => {
+      if (statusData?.status === "failed" || statusData?.status === "ready") {
+        clearInterval(interval);
+      } else {
+        refetch();
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [taskId, statusData?.status, refetch]);
+  console.log("eeeerrrr" + submitError);
+  return {
+    submitVideo,
+    isSubmitting,
+    isSubmitSuccess, // Not used atm
+    submitError, // Not used atm
+    embedData,
+    taskId, // Not used atm
+    statusData,
+    isPolling,
+  };
+};

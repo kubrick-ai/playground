@@ -27,6 +27,10 @@ const data = {
           title: "Library",
           url: "/library",
         },
+        {
+          title: "Embed",
+          url: "/embed",
+        },
       ],
     },
     {
