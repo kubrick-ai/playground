@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useSearchVideos } from "@/hooks/useKubrickAPI";
+import VideoList from "@/components/VideoList";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
@@ -21,7 +22,7 @@ const searchFormSchema = z.object({
 
 const Search = () => {
   const [searchParams, setSearchParams] = useState<{ query_text?: string }>({});
-  const { data: embeddings, isLoading, error } = useSearchVideos(searchParams);
+  const { data: results, isLoading, error } = useSearchVideos(searchParams);
 
   const form = useForm<z.infer<typeof searchFormSchema>>({
     resolver: zodResolver(searchFormSchema),
@@ -62,38 +63,12 @@ const Search = () => {
       {isLoading && <p>Loading...</p>}
       {error && <p className="text-red-500">Error: {error.message}</p>}
 
-      {embeddings && (
+      {results && (
         <div>
           <h2 className="text-xl font-semibold mb-4">
-            Results ({embeddings.length})
+            Results ({results.length})
           </h2>
-          <div className="space-y-4">
-            {embeddings.map((embedding) => (
-              <div
-                key={embedding.id}
-                className="border border-gray-200 rounded p-4"
-              >
-                <div className="text-sm text-gray-600 mb-2">
-                  <span className="font-medium">ID:</span> {embedding.id}
-                </div>
-                <div className="text-sm text-gray-600 mb-2">
-                  <span className="font-medium">Source:</span>{" "}
-                  {embedding.source}
-                </div>
-                <div className="text-sm text-gray-600 mb-2">
-                  <span className="font-medium">Time:</span>{" "}
-                  {embedding.start_time}s - {embedding.end_time}s
-                </div>
-                <div className="text-sm text-gray-600 mb-2">
-                  <span className="font-medium">Scope:</span> {embedding.scope}
-                </div>
-                <div className="text-sm text-gray-600">
-                  <span className="font-medium">Modality:</span>{" "}
-                  {embedding.modality}
-                </div>
-              </div>
-            ))}
-          </div>
+          <VideoList videos={results} />
         </div>
       )}
     </div>

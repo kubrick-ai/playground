@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { VideoSchema, Video, EmbeddingSchema, Embedding } from "@/types";
+import { VideoSchema, Video } from "@/types";
 
 // TODO: Move to config?
 const API_BASE = "/api/proxy";
@@ -14,7 +14,7 @@ interface SearchParams {
   min_similarity?: number;
 }
 
-const search = async (params: SearchParams): Promise<Array<Embedding>> => {
+const search = async (params: SearchParams): Promise<Array<Video>> => {
   const formData = new FormData();
   if (params.query_text) {
     formData.append("query_text", params.query_text);
@@ -37,13 +37,21 @@ const search = async (params: SearchParams): Promise<Array<Embedding>> => {
   }
 
   const response = await axios.post(`${API_BASE}/search`, formData);
-  const parsedVideos = EmbeddingSchema.array().parse(response.data.data);
+  console.log(response);
+  const parsedVideos = VideoSchema.array().parse(response.data.data);
   return parsedVideos;
 };
 
 export const useSearchVideos = (params: SearchParams) => {
-  return useQuery<Array<Embedding>, Error>({
-    queryKey: ["searchVideos", params], // Unique key for this query
+  return useQuery<Array<Video>, Error>({
+    queryKey: [
+      "searchVideos",
+      params.query_text,
+      params.query_media_type,
+      params.query_media_url,
+      params.page_limit,
+      params.min_similarity,
+    ], // Unique key for this query
     queryFn: () => search(params), // Your async function to fetch data
     enabled: !!params.query_text || !!params.query_media_type, // Only run when there's something to search
   });

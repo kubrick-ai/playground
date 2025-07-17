@@ -1,18 +1,12 @@
 "use client";
 
+import { Video } from "@/types";
 import VideoThumbnail from "@/components/VideoThumbnail";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-interface VideoItem {
-  src: string;
-  startTime: number;
-}
-
 interface VideoListProps {
-  videos: VideoItem[];
-  searchQuery?: string;
-  filteredVideos?: VideoItem[];
+  videos: Array<Video>;
 }
 
 const THUMBNAILS_PER_PAGE = 12;
@@ -32,8 +26,12 @@ const VideoList = ({ videos }: VideoListProps) => {
   return (
     <>
       <div className="flex flex-wrap gap-4 justify-start">
-        {currentVideos.map(({ src, startTime }, idx) => (
-          <VideoThumbnail key={idx} src={src} startTime={startTime} />
+        {currentVideos.map((video) => (
+          <VideoThumbnail
+            key={video.id}
+            video={video}
+            startTime={video.start_time ?? 0}
+          />
         ))}
       </div>
 
