@@ -2,33 +2,41 @@
 
 import * as MediaPlayer from "@/components/ui/media-player";
 import { useEffect, useRef } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
+import { Video } from "@/types";
 
 interface VideoThumbnailProps {
-  src: string;
+  video: Video;
   startTime?: number;
+  endTime?: number;
   width?: number;
   height?: number;
 }
 
 const VideoThumbnail = ({
-  src,
+  video,
   startTime = 0,
   width = 300,
-  height = 200,
+  height = 300,
 }: VideoThumbnailProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.currentTime = startTime;
+    const curVideo = videoRef.current;
+    if (!curVideo) return;
+    curVideo.currentTime = startTime;
   }, [startTime]);
 
   return (
     <Card
       style={{ width, height }}
-      className="relative overflow-hidden rounded-xl shadow-sm"
+      className="relative overflow-hidden rounded-xl shadow-sm pt-0"
     >
       <CardContent className="p-0 w-full h-full">
         <MediaPlayer.Root autoHide={false} className="w-full h-full">
@@ -38,7 +46,7 @@ const VideoThumbnail = ({
             // muted
             // autoPlay
           >
-            <source src={src} type="video/mp4" />
+            <source src={video.url} type="video/mp4" />
           </MediaPlayer.Video>
 
           <MediaPlayer.Loading />
@@ -63,6 +71,14 @@ const VideoThumbnail = ({
           </MediaPlayer.Controls>
         </MediaPlayer.Root>
       </CardContent>
+      <CardFooter>
+        {video.title && <CardTitle>{video.title}</CardTitle>}
+        <CardDescription>
+          {video.modality && <p>Modality: {video.modality}</p>}
+          {video.scope && <p>Scope: {video.scope}</p>}
+          {video.similarity && <p>Similarity: {video.similarity.toFixed(5)}</p>}
+        </CardDescription>
+      </CardFooter>
     </Card>
   );
 };

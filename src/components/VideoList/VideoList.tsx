@@ -1,12 +1,12 @@
 "use client";
 
-import { Video, Embedding } from "@/types";
+import { Video } from "@/types";
 import VideoThumbnail from "@/components/VideoThumbnail";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 interface VideoListProps {
-  videos: Array<Embedding>;
+  videos: Array<Video>;
 }
 
 const THUMBNAILS_PER_PAGE = 12;
@@ -26,8 +26,12 @@ const VideoList = ({ videos }: VideoListProps) => {
   return (
     <>
       <div className="flex flex-wrap gap-4 justify-start">
-        {currentVideos.map(({ source, start_time }, idx) => (
-          <VideoThumbnail key={idx} src={source} startTime={start_time} />
+        {currentVideos.map((video) => (
+          <VideoThumbnail
+            key={video.id}
+            video={video}
+            startTime={video.start_time ?? 0}
+          />
         ))}
       </div>
 
