@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const VideoSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   source: z.string(),
   filename: z.string().optional(),
   duration: z.number().optional(),
