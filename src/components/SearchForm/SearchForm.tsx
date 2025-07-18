@@ -34,6 +34,13 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { useEffect } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SearchFormParams {
   setSearchParams: (params: SearchParams) => void;
@@ -63,6 +70,17 @@ const SearchForm = ({
     resolver: zodResolver(SearchFormSchema),
     defaultValues,
   });
+
+  const selectedMediaType = form.watch("query_media_type");
+
+  useEffect(() => {
+    if (selectedMediaType) {
+      form.setValue("query_media_file", undefined);
+      if (selectedMediaType !== "video") {
+        form.setValue("query_modality", ["visual-text"]);
+      }
+    }
+  }, [selectedMediaType, form]);
 
   const onSubmit = (values: z.infer<typeof SearchFormSchema>) => {
     const params: SearchParams = {
@@ -107,14 +125,18 @@ const SearchForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="flex w-full max-w-md items-center gap-1">
+        <div className="flex w-full max-w-md items-center gap-4">
           <FormField
             control={form.control}
             name="query_text"
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormControl>
-                  <Input placeholder="Enter search query..." {...field} />
+                  <Input
+                    className="min-w-90"
+                    placeholder="Enter search query..."
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -136,7 +158,7 @@ const SearchForm = ({
           </CollapsibleTrigger>
 
           <CollapsibleContent className="space-y-4 pt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_4fr_2fr] gap-4">
               <FormField
                 control={form.control}
                 name="query_media_type"
@@ -163,30 +185,145 @@ const SearchForm = ({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="query_media_file"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Media File</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept="image/*,video/*,audio/*"
-                        onChange={(e) => field.onChange(e.target.files?.[0])}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {selectedMediaType && (
+                <FormField
+                  control={form.control}
+                  name="query_media_file"
+                  render={({ field }) => {
+                    const getAcceptType = () => {
+                      switch (selectedMediaType) {
+                        case "image":
+                          return "image/*";
+                        case "video":
+                          return "video/*";
+                        case "audio":
+                          return "audio/*";
+                        default:
+                          return "image/*,video/*,audio/*";
+                      }
+                    };
 
+                    return (
+                      <FormItem>
+                        <FormLabel>Media File</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="file"
+                            accept={getAcceptType()}
+                            onChange={(e) =>
+                              field.onChange(e.target.files?.[0])
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
+              )}
+
+              {selectedMediaType === "video" && (
+                <FormField
+                  control={form.control}
+                  name="query_modality"
+                  render={({ field }) => (
+                    <FormItem>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FormLabel>Query Modality</FormLabel>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              Select which embedding modality of your query
+                              video to search with
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <DropdownMenu>
+                        <FormControl>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="justify-between w-42 "
+                            >
+                              {field.value && field.value.length > 0
+                                ? field.value.join(", ")
+                                : "Select Modality"}
+                              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                        </FormControl>
+                        <DropdownMenuContent>
+                          <DropdownMenuLabel>Select</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuCheckboxItem
+                            checked={field.value?.includes("visual-text")}
+                            onCheckedChange={(checked) => {
+                              const currentValues = field.value || [];
+                              if (checked) {
+                                field.onChange([
+                                  ...currentValues,
+                                  "visual-text",
+                                ]);
+                              } else {
+                                field.onChange(
+                                  currentValues.filter(
+                                    (v) => v !== "visual-text",
+                                  ),
+                                );
+                              }
+                            }}
+                          >
+                            Visual-Text
+                          </DropdownMenuCheckboxItem>
+                          <DropdownMenuCheckboxItem
+                            checked={field.value?.includes("audio")}
+                            onCheckedChange={(checked) => {
+                              const currentValues = field.value || [];
+                              if (checked) {
+                                field.onChange([...currentValues, "audio"]);
+                              } else {
+                                field.onChange(
+                                  currentValues.filter((v) => v !== "audio"),
+                                );
+                              }
+                            }}
+                          >
+                            Audio
+                          </DropdownMenuCheckboxItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_4fr_2fr] gap-4">
               <FormField
                 control={form.control}
                 name="search_scope"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Scope</FormLabel>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <FormLabel>Scope</FormLabel>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Filter search results by their embedding scope.</p>
+                          <p>
+                            - `clip` will search embeddings of video segments,
+                          </p>
+                          <p>
+                            - `video` will search embeddings of entire videos.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value || ""}
@@ -209,72 +346,21 @@ const SearchForm = ({
 
               <FormField
                 control={form.control}
-                name="query_modality"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Query Modality</FormLabel>
-                    <DropdownMenu>
-                      <FormControl>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="justify-between w-42 "
-                          >
-                            {field.value && field.value.length > 0
-                              ? field.value.join(", ")
-                              : "Select Modality"}
-                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                      </FormControl>
-                      <DropdownMenuContent>
-                        <DropdownMenuLabel>Select</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuCheckboxItem
-                          checked={field.value?.includes("visual-text")}
-                          onCheckedChange={(checked) => {
-                            const currentValues = field.value || [];
-                            if (checked) {
-                              field.onChange([...currentValues, "visual-text"]);
-                            } else {
-                              field.onChange(
-                                currentValues.filter(
-                                  (v) => v !== "visual-text",
-                                ),
-                              );
-                            }
-                          }}
-                        >
-                          Visual-Text
-                        </DropdownMenuCheckboxItem>
-                        <DropdownMenuCheckboxItem
-                          checked={field.value?.includes("audio")}
-                          onCheckedChange={(checked) => {
-                            const currentValues = field.value || [];
-                            if (checked) {
-                              field.onChange([...currentValues, "audio"]);
-                            } else {
-                              field.onChange(
-                                currentValues.filter((v) => v !== "audio"),
-                              );
-                            }
-                          }}
-                        >
-                          Audio
-                        </DropdownMenuCheckboxItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="search_modality"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Search Modality</FormLabel>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <FormLabel>Scope</FormLabel>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            Filter search results by their embedding modality
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value || ""}
@@ -302,7 +388,19 @@ const SearchForm = ({
                 name="min_similarity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Min Similarity: {field.value}</FormLabel>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <FormLabel>Min Similarity: {field.value}</FormLabel>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            Threshold for minimum Cosine Similarity of a search
+                            result
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <FormControl>
                       <Slider
                         min={0}
@@ -323,10 +421,19 @@ const SearchForm = ({
               name="filter"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Advanced Filter (JSON)</FormLabel>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <FormLabel>Advanced Filter (JSON)</FormLabel>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Filter on metadata using a JSON</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <FormControl>
                     <textarea
-                      className="w-full p-2 border rounded-md"
+                      className="w-md p-2 border rounded-md"
                       rows={3}
                       placeholder='{"key": "value"}'
                       {...field}
