@@ -66,15 +66,7 @@ const data = {
           url: "#",
         },
         {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
+          title: "Logs",
           url: "#",
         },
       ],

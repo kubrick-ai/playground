@@ -107,7 +107,7 @@ const SearchForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="flex w-full max-w-sm items-center gap-1">
+        <div className="flex w-full max-w-md items-center gap-1">
           <FormField
             control={form.control}
             name="query_text"
