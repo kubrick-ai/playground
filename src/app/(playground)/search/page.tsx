@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchVideos } from "@/hooks/useKubrickAPI";
-import VideoList from "@/components/VideoList";
+import SearchResultList from "@/components/SearchResultList";
 import { SearchParams } from "@/types";
 import SearchForm from "@/components/SearchForm";
 
@@ -28,7 +28,7 @@ const Search = () => {
           <h2 className="text-xl font-semibold mb-4">
             Results ({results.length})
           </h2>
-          <VideoList videos={results} />
+          <SearchResultList results={results} />
         </div>
       )}
     </div>

@@ -22,14 +22,21 @@ export const VideoSchema = z.object({
   updated_at: z.string(),
   height: z.number().nullable().optional(),
   width: z.number().nullable().optional(),
+});
+
+export type Video = z.infer<typeof VideoSchema>;
+
+export const SearchResultSchema = z.object({
+  id: z.number(),
   modality: EmbeddingModalitySchema.optional(),
   scope: EmbeddingScopeSchema.optional(),
   start_time: z.number().optional(),
   end_time: z.number().optional(),
   similarity: z.number(),
+  video: VideoSchema,
 });
 
-export type Video = z.infer<typeof VideoSchema>;
+export type SearchResult = z.infer<typeof SearchResultSchema>;
 
 export const SearchFormSchema = z.object({
   query_text: z.string().optional(),
