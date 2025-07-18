@@ -97,10 +97,9 @@ const SearchForm = ({
     setSearchParams(params);
   };
 
-  const clearOptions = () => {
+  const reset = () => {
     form.reset({
       ...defaultValues,
-      query_text: form.getValues("query_text"),
     });
   };
 
@@ -337,8 +336,8 @@ const SearchForm = ({
               )}
             />
 
-            <Button type="button" variant="outline" onClick={clearOptions}>
-              Clear Options
+            <Button type="button" variant="outline" onClick={reset}>
+              Reset
             </Button>
           </CollapsibleContent>
         </Collapsible>
