@@ -17,6 +17,7 @@ interface VideoThumbnailProps {
   endTime?: number;
   width?: number;
   height?: number;
+  children?: React.ReactNode;
 }
 
 const VideoThumbnail = ({
@@ -24,6 +25,7 @@ const VideoThumbnail = ({
   startTime = 0,
   width = 300,
   height = 300,
+  children,
 }: VideoThumbnailProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -73,11 +75,7 @@ const VideoThumbnail = ({
       </CardContent>
       <CardFooter>
         {video.title && <CardTitle>{video.title}</CardTitle>}
-        <CardDescription>
-          {video.modality && <p>Modality: {video.modality}</p>}
-          {video.scope && <p>Scope: {video.scope}</p>}
-          {video.similarity && <p>Similarity: {video.similarity.toFixed(5)}</p>}
-        </CardDescription>
+        <CardDescription>{children}</CardDescription>
       </CardFooter>
     </Card>
   );
