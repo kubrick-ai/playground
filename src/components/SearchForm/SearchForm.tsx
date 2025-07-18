@@ -25,6 +25,14 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface SearchFormParams {
@@ -43,6 +51,7 @@ const SearchForm = ({
     query_media_type: undefined,
     query_media_url: undefined,
     query_media_file: undefined,
+    query_modality: ["visual-text" as const],
     search_scope: "clip" as const,
     search_modality: "all" as const,
     min_similarity: 0.2,
@@ -61,6 +70,7 @@ const SearchForm = ({
       query_media_type: values.query_media_type,
       query_media_url: values.query_media_url,
       query_media_file: values.query_media_file,
+      query_modality: values.query_modality,
       min_similarity: values.min_similarity,
       page_limit: values.page_limit,
       filter: "{}",
@@ -87,10 +97,9 @@ const SearchForm = ({
     setSearchParams(params);
   };
 
-  const clearOptions = () => {
+  const reset = () => {
     form.reset({
       ...defaultValues,
-      query_text: form.getValues("query_text"),
     });
   };
 
@@ -199,17 +208,79 @@ const SearchForm = ({
 
               <FormField
                 control={form.control}
+                name="query_modality"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Query Modality</FormLabel>
+                    <DropdownMenu>
+                      <FormControl>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="justify-between w-42 "
+                          >
+                            {field.value && field.value.length > 0
+                              ? field.value.join(", ")
+                              : "Select Modality"}
+                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                      </FormControl>
+                      <DropdownMenuContent>
+                        <DropdownMenuLabel>Select</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuCheckboxItem
+                          checked={field.value?.includes("visual-text")}
+                          onCheckedChange={(checked) => {
+                            const currentValues = field.value || [];
+                            if (checked) {
+                              field.onChange([...currentValues, "visual-text"]);
+                            } else {
+                              field.onChange(
+                                currentValues.filter(
+                                  (v) => v !== "visual-text",
+                                ),
+                              );
+                            }
+                          }}
+                        >
+                          Visual-Text
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                          checked={field.value?.includes("audio")}
+                          onCheckedChange={(checked) => {
+                            const currentValues = field.value || [];
+                            if (checked) {
+                              field.onChange([...currentValues, "audio"]);
+                            } else {
+                              field.onChange(
+                                currentValues.filter((v) => v !== "audio"),
+                              );
+                            }
+                          }}
+                        >
+                          Audio
+                        </DropdownMenuCheckboxItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="search_modality"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Modality</FormLabel>
+                    <FormLabel>Search Modality</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value || ""}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select modality" />
+                          <SelectValue placeholder="Select modality to search" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -265,8 +336,8 @@ const SearchForm = ({
               )}
             />
 
-            <Button type="button" variant="outline" onClick={clearOptions}>
-              Clear Options
+            <Button type="button" variant="outline" onClick={reset}>
+              Reset
             </Button>
           </CollapsibleContent>
         </Collapsible>

@@ -1,12 +1,18 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { VideoSchema, Video, SearchParams } from "@/types";
+import {
+  VideoSchema,
+  Video,
+  SearchParams,
+  SearchResultSchema,
+  SearchResult,
+} from "@/types";
 
 // TODO: Move to config?
 const API_BASE = "/api/proxy";
 
-const search = async (params: SearchParams): Promise<Array<Video>> => {
+const search = async (params: SearchParams): Promise<Array<SearchResult>> => {
   const formData = new FormData();
   if (params.query_text) {
     formData.append("query_text", params.query_text);
@@ -30,19 +36,25 @@ const search = async (params: SearchParams): Promise<Array<Video>> => {
   if (params.filter) {
     formData.append("filter", params.filter);
   }
+  if (params.query_modality) {
+    for (const modality of params.query_modality) {
+      formData.append("query_modality", modality);
+    }
+  }
 
   const response = await axios.post(`${API_BASE}/search`, formData);
-  const parsedVideos = VideoSchema.array().parse(response.data.data);
+  const parsedVideos = SearchResultSchema.array().parse(response.data.data);
   return parsedVideos;
 };
 
 export const useSearchVideos = (params: SearchParams) => {
-  return useQuery<Array<Video>, Error>({
+  return useQuery<Array<SearchResult>, Error>({
     queryKey: [
       "searchVideos",
       params.query_text,
       params.query_media_type,
       params.query_media_url,
+      params.query_modality,
       params.page_limit,
       params.min_similarity,
       params.filter,
@@ -155,7 +167,7 @@ export const useEmbedVideo = () => {
 
 export const fetchVideos = async (
   page = 0,
-  pageLimit = 12
+  pageLimit = 12,
 ): Promise<Video[]> => {
   const response = await axios.get(`${API_BASE}/videos`, {
     params: { page, page_limit: pageLimit },

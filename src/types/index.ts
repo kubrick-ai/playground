@@ -22,20 +22,28 @@ export const VideoSchema = z.object({
   updated_at: z.string(),
   height: z.number().nullable().optional(),
   width: z.number().nullable().optional(),
+});
+
+export type Video = z.infer<typeof VideoSchema>;
+
+export const SearchResultSchema = z.object({
+  id: z.number(),
   modality: EmbeddingModalitySchema.optional(),
   scope: EmbeddingScopeSchema.optional(),
   start_time: z.number().optional(),
   end_time: z.number().optional(),
-  similarity: z.number().optional(), // had to make this optional to work with  useKubrickAPI.ts -> const fetchVideos
+  similarity: z.number(),
+  video: VideoSchema,
 });
 
-export type Video = z.infer<typeof VideoSchema>;
+export type SearchResult = z.infer<typeof SearchResultSchema>;
 
 export const SearchFormSchema = z.object({
   query_text: z.string().optional(),
   query_media_type: MediaTypeSchema.optional(),
   query_media_url: z.url().optional(),
   query_media_file: z.instanceof(File).optional(),
+  query_modality: EmbeddingModalitySchema.array().optional(),
   search_scope: z.union([EmbeddingScopeSchema, z.literal("all")]).optional(),
   search_modality: z
     .union([EmbeddingModalitySchema, z.literal("all")])
@@ -50,6 +58,7 @@ export const SearchParamsSchema = z.object({
   query_media_type: MediaTypeSchema.optional(),
   query_media_url: z.url().optional(),
   query_media_file: z.instanceof(File).optional(),
+  query_modality: EmbeddingModalitySchema.array().optional(),
   min_similarity: CosineSimilaritySchema.optional(),
   page_limit: z.int().min(0).optional(),
   filter: z.string().optional(),
