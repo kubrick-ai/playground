@@ -158,7 +158,7 @@ const SearchForm = ({
           </CollapsibleTrigger>
 
           <CollapsibleContent className="space-y-4 pt-4">
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_4fr_2fr] gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_3fr_3fr_3fr] gap-4">
               <FormField
                 control={form.control}
                 name="query_media_type"
@@ -185,42 +185,58 @@ const SearchForm = ({
                 )}
               />
 
-              {selectedMediaType && (
-                <FormField
-                  control={form.control}
-                  name="query_media_file"
-                  render={({ field }) => {
-                    const getAcceptType = () => {
-                      switch (selectedMediaType) {
-                        case "image":
-                          return "image/*";
-                        case "video":
-                          return "video/*";
-                        case "audio":
-                          return "audio/*";
-                        default:
-                          return "image/*,video/*,audio/*";
-                      }
-                    };
+              <FormField
+                control={form.control}
+                name="query_media_file"
+                render={({ field }) => {
+                  const getAcceptType = () => {
+                    switch (selectedMediaType) {
+                      case "image":
+                        return "image/*";
+                      case "video":
+                        return "video/*";
+                      case "audio":
+                        return "audio/*";
+                      default:
+                        return "image/*,video/*,audio/*";
+                    }
+                  };
 
-                    return (
-                      <FormItem>
-                        <FormLabel>Media File</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="file"
-                            accept={getAcceptType()}
-                            onChange={(e) =>
-                              field.onChange(e.target.files?.[0])
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />
-              )}
+                  return (
+                    <FormItem>
+                      <FormLabel>Media File</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept={getAcceptType()}
+                          onChange={(e) => field.onChange(e.target.files?.[0])}
+                          disabled={!selectedMediaType}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
+
+              <FormField
+                control={form.control}
+                name="query_media_url"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Media Url</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="min-w-40"
+                        placeholder="Enter media url..."
+                        {...field}
+                        disabled={!selectedMediaType}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {selectedMediaType === "video" && (
                 <FormField
@@ -241,12 +257,14 @@ const SearchForm = ({
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
+
                       <DropdownMenu>
                         <FormControl>
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="outline"
                               className="justify-between w-42 "
+                              disabled={selectedMediaType !== "video"}
                             >
                               {field.value && field.value.length > 0
                                 ? field.value.join(", ")
