@@ -32,7 +32,8 @@ const VideoThumbnail = ({
     if (!curVideo) return;
     curVideo.currentTime = startTime;
   }, [startTime]);
-
+  // console.log(video["file_name"]);
+  // console.log(video.filename);
   return (
     <Card
       style={{ width, height }}
@@ -77,6 +78,7 @@ const VideoThumbnail = ({
           {video.modality && <p>Modality: {video.modality}</p>}
           {video.scope && <p>Scope: {video.scope}</p>}
           {video.similarity && <p>Similarity: {video.similarity.toFixed(5)}</p>}
+          {video.filename && <p>{video.filename}</p>}
         </CardDescription>
       </CardFooter>
     </Card>

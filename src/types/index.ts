@@ -26,7 +26,7 @@ export const VideoSchema = z.object({
   scope: EmbeddingScopeSchema.optional(),
   start_time: z.number().optional(),
   end_time: z.number().optional(),
-  similarity: z.number(),
+  similarity: z.number().optional(), // had to make this optional to work with  useKubrickAPI.ts -> const fetchVideos
 });
 
 export type Video = z.infer<typeof VideoSchema>;

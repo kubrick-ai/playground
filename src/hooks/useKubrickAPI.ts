@@ -3,7 +3,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { VideoSchema, Video, SearchParams } from "@/types";
 
-
 // TODO: Move to config?
 const API_BASE = "/api/proxy";
 
@@ -151,3 +150,25 @@ export const useEmbedVideo = () => {
     isPolling,
   };
 };
+
+///
+
+export const fetchVideos = async (
+  page = 0,
+  pageLimit = 12
+): Promise<Video[]> => {
+  const response = await axios.get(`${API_BASE}/videos`, {
+    params: { page, page_limit: pageLimit },
+  });
+
+  const parsedVideos = VideoSchema.array().parse(response.data.data);
+  return parsedVideos;
+};
+
+// React Query hook for videos
+export const useGetVideos = (page = 0, pageLimit = 12) =>
+  useQuery<Video[], Error>({
+    queryKey: ["videos", page, pageLimit],
+    queryFn: () => fetchVideos(page, pageLimit),
+    placeholderData: (prev) => prev, // Keeps old data during loading
+  });
