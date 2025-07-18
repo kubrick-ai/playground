@@ -56,7 +56,7 @@ const SearchForm = ({
   const defaultValues = {
     query_text: "",
     query_media_type: undefined,
-    query_media_url: undefined,
+    query_media_url: "",
     query_media_file: undefined,
     query_modality: ["visual-text" as const],
     search_scope: "clip" as const,
