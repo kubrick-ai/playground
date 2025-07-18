@@ -34,8 +34,7 @@ const VideoThumbnail = ({
     if (!curVideo) return;
     curVideo.currentTime = startTime;
   }, [startTime]);
-  // console.log(video["file_name"]);
-  // console.log(video.filename);
+
   return (
     <Card
       style={{ width, height }}
