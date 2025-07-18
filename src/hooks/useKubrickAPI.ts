@@ -3,7 +3,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { VideoSchema, Video, SearchParams } from "@/types";
 
-
 // TODO: Move to config?
 const API_BASE = "/api/proxy";
 
@@ -30,6 +29,11 @@ const search = async (params: SearchParams): Promise<Array<Video>> => {
   }
   if (params.filter) {
     formData.append("filter", params.filter);
+  }
+  if (params.query_modality) {
+    for (const modality of params.query_modality) {
+      formData.append("query_modality", modality);
+    }
   }
 
   const response = await axios.post(`${API_BASE}/search`, formData);

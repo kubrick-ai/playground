@@ -36,6 +36,7 @@ export const SearchFormSchema = z.object({
   query_media_type: MediaTypeSchema.optional(),
   query_media_url: z.url().optional(),
   query_media_file: z.instanceof(File).optional(),
+  query_modality: EmbeddingModalitySchema.array().optional(),
   search_scope: z.union([EmbeddingScopeSchema, z.literal("all")]).optional(),
   search_modality: z
     .union([EmbeddingModalitySchema, z.literal("all")])
@@ -50,6 +51,7 @@ export const SearchParamsSchema = z.object({
   query_media_type: MediaTypeSchema.optional(),
   query_media_url: z.url().optional(),
   query_media_file: z.instanceof(File).optional(),
+  query_modality: EmbeddingModalitySchema.array().optional(),
   min_similarity: CosineSimilaritySchema.optional(),
   page_limit: z.int().min(0).optional(),
   filter: z.string().optional(),
