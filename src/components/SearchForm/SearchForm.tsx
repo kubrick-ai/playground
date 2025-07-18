@@ -352,7 +352,7 @@ const SearchForm = ({
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <FormLabel>Scope</FormLabel>
+                          <FormLabel>Search Modality</FormLabel>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>
