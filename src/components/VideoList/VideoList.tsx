@@ -3,6 +3,8 @@
 import { Video } from "@/types";
 import VideoThumbnail from "@/components/VideoThumbnail";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 
 interface VideoListProps {
@@ -28,15 +30,33 @@ const VideoList = ({ videos }: VideoListProps) => {
       <div className="flex flex-wrap gap-4 justify-start">
         {currentVideos.map((video) => (
           <VideoThumbnail key={video.id} video={video}>
-            <p>{video.filename}</p>
-            <p>Duration: {video.duration}s</p>
-            <p>{video.created_at}</p>
-            <p>
-              Source: <a href={video.url}>{video.url.slice(0, 20)}...</a>
-            </p>
-            <p>
-              Resolution: {video.width}x{video.height}
-            </p>
+            <div className="space-y-2 text-sm">
+              <div className="font-medium truncate">{video.filename}</div>
+
+              <div className="flex gap-2 flex-wrap">
+                <Badge variant="secondary" className="text-xs">
+                  {video.duration}s
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  {video.width}×{video.height}
+                </Badge>
+              </div>
+
+              <Separator />
+
+              <div className="text-xs text-muted-foreground space-y-1">
+                <div>{video.created_at}</div>
+                <a
+                  href={video.url}
+                  className="text-blue-600 hover:text-blue-800 underline inline-block max-w-full overflow-hidden whitespace-nowrap text-ellipsis"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={video.url}
+                >
+                  source
+                </a>
+              </div>
+            </div>
           </VideoThumbnail>
         ))}
       </div>
