@@ -42,7 +42,10 @@ const VideoThumbnail = ({
       className="relative overflow-hidden rounded-xl shadow-sm pt-0"
     >
       <CardContent className="p-0 w-full h-full">
-        <MediaPlayer.Root autoHide={false} className="w-full h-full">
+        <MediaPlayer.Root
+          autoHide={false}
+          className="w-full h-full aspect-[16/9]"
+        >
           <MediaPlayer.Video
             ref={videoRef}
             className="w-full h-full object-cover rounded-md"
