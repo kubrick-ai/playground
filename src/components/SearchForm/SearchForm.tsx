@@ -98,6 +98,7 @@ const SearchForm = ({
   };
 
   const reset = () => {
+    setSearchParams({});
     form.reset({
       ...defaultValues,
     });
