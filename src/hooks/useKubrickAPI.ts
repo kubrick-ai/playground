@@ -54,6 +54,7 @@ export const useSearchVideos = (params: SearchParams) => {
       params.query_text,
       params.query_media_type,
       params.query_media_url,
+      params.query_media_file,
       params.query_modality,
       params.page_limit,
       params.min_similarity,
