@@ -11,6 +11,7 @@ import {
 
 // TODO: Move to config?
 const API_BASE = "/api/proxy";
+const DEFAULT_TIMEOUT = 300000; // 5 minutes
 
 const search = async (params: SearchParams): Promise<Array<SearchResult>> => {
   const formData = new FormData();
@@ -105,7 +106,9 @@ const createEmbedTask = async (video_url: string): Promise<EmbedResponse> => {
   const formData = new FormData();
   formData.append("video_url", video_url);
 
-  const res = await axios.post(`${API_BASE}/tasks`, formData);
+  const res = await axios.post(`${API_BASE}/tasks`, formData, {
+    timeout: DEFAULT_TIMEOUT,
+  });
   return res.data;
 };
 
